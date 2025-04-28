@@ -20,14 +20,14 @@ db.connect(err => {
   console.log('MySQL connected...');
 });
 
-app.post('/api/timesheets', (req, res) => {
-  const { description, rate, lineItems } = req.body;
+app.post('/api/timesheets', (req, res) => {  
+  const { description, rate, lineItems, username } = req.body;
   const totalTime = lineItems.reduce((sum, item) => sum + item.minutes, 0);
   const totalCost = totalTime * rate;
 
   db.query(
-    'INSERT INTO timesheets (description, rate, total_time, total_cost) VALUES (?, ?, ?, ?)',
-    [description, rate, totalTime, totalCost],
+    'INSERT INTO timesheets (description, rate, total_time, total_cost, username) VALUES (?, ?, ?, ?, ?)',
+    [description, rate, totalTime, totalCost, username],
     (err, result) => {
       if (err) return res.status(500).json(err);
       const timesheetId = result.insertId;
@@ -48,12 +48,20 @@ app.post('/api/timesheets', (req, res) => {
     }
   );
 });
-
+//return items that match current user name 
 app.get('/api/timesheets', (req, res) => {
+  const username = req.query.username;
+
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+
   db.query(
-    'SELECT * FROM timesheets ORDER BY created_at DESC',
+    'SELECT * FROM timesheets WHERE username = ? ORDER BY created_at DESC',
+    [username],
     (err, timesheets) => {
-      if (err) return res.status(500).json(err); //error catch 
+      if (err) return res.status(500).json(err); // error catch
+
       const fetchLineItems = timesheets.map(ts => { 
         return new Promise((resolve, reject) => {
           db.query(
@@ -61,8 +69,16 @@ app.get('/api/timesheets', (req, res) => {
             [ts.id],
             (err, items) => {
               if (err) reject(err);
-              else resolve({ ...ts, lineItems: items });
+              else {
+                // Calculate total time and total cost for each timesheet
+                console.log("Hello, Node.js!" + JSON.stringify(ts));
+                console.log("Hello, Node.js!" + JSON.stringify(items));
+                resolve({
+                  ...ts,
+                  lineItems: items
+                });
             }
+          }
           );
         });
       });
