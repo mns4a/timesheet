@@ -26,11 +26,14 @@ function App() {
 
   // Create final URI by combining the prefix and endpoint
   const createFinalUri = (endpoint) => {
+    alert("config:" + config); 
     if (config) {
       const { host, port } = config;
-      const prefix = `http://${host}:${port}`;
+      const prefix = `https://${host}:${port}`;
+      //const prefix = `https://${host}`;
       const fullUri = `${prefix}${endpoint}`;
       setFinalUri(fullUri);
+      alert("finaluri:" + fullUri);
       return fullUri;
     }
     return '';
@@ -65,6 +68,8 @@ function App() {
       const endpoint = '/api/timesheets';  // Example endpoint
       const uri = createFinalUri(endpoint);
 
+      //const res = await axios.get(uri + `?username=${encodeURIComponent(username)}`);
+
       const res = await axios.get(uri + `?username=${encodeURIComponent(username)}`);
       
       setSaved(res.data);
@@ -97,6 +102,8 @@ function App() {
     try {
       const endpoint = '/api/timesheets';  // Example endpoint
       const uri = createFinalUri(endpoint);
+      alert("uri1"+uri);
+      //const response = await axios.post(uri, timesheetData);
       const response = await axios.post(uri, timesheetData);
       console.log('Timesheet saved:', response.data);
       alert('Timesheet saved successfully!');
