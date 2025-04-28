@@ -1,11 +1,17 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+//Functionality:
+// This app only allows adding timesheet entries for a user. 
+// If the value entered for rate, time, or date are invalid, or you 
+// try to save a timesheet without adding line items, the app will alert you to fix the needed fields. 
+// This app does not have the functionality to edit past timesheets or delete entries. 
 
+ 
 function App() {
   const [description, setDescription] = useState('');
-  const [rate, setRate] = useState(0);      // official rate
-  const [tempRate, setTempRate] = useState('');  // editable value
+  const [rate, setRate] = useState(0);      
+  const [tempRate, setTempRate] = useState('');  
   const [date, setDate] = useState('');
   const [minutes, setMinutes] = useState('');
   const [lineItems, setLineItems] = useState([]);
@@ -16,7 +22,7 @@ function App() {
   const [config, setConfig] = useState(null);
   const [finalUri, setFinalUri] = useState('');
 
-  // Fetch the config.json on component mount
+  // Fetch config.json to set up service endpoint url 
   useEffect(() => {
     fetch('/config.json')
       .then(response => response.json())
@@ -38,14 +44,14 @@ function App() {
       //const prefix = `https://${host}`;
       const fullUri = `${prefix}${endpoint}`;
       setFinalUri(fullUri);
-      //("finaluri:" + fulalertlUri);
+      //alert("finaluri:" + fullUri);
       return fullUri;
     }
     return '';
   };
 
   
-  //const [savedTimesheets, setSavedTimesheets] = useState([]);
+  
 
   const addLineItem = () => {
     if (date && minutes) {
@@ -55,25 +61,15 @@ function App() {
     }
   };
 
-  // const submitTimesheet = async () => {
-  //   await axios.post('http://localhost:3001/api/timesheets', {
-  //     description,
-  //     rate,
-  //     lineItems
-  //   });
-  //   setDescription(''); 
-  //   setRate('');
-  //   setLineItems([]);
-  //   fetchTimesheets();
-  // };
-
+  
+  //Calls endpoint to get timesheets when the page is loaded with specific username
   const fetchTimesheets = async (username) => {
     if (!username) return;
     try {
-      const endpoint = '/api/timesheets';  // Example endpoint
+      const endpoint = '/api/timesheets';  
       const uri = createFinalUri(endpoint);
 
-      //const res = await axios.get(uri + `?username=${encodeURIComponent(username)}`);
+    
 
       const res = await axios.get(uri + `?username=${encodeURIComponent(username)}`);
       
@@ -82,6 +78,10 @@ function App() {
       console.error('Error fetching timesheets:', error);
     }
   };
+
+  //handleSave is used to handle saving a timesheet when the "Save Timesheet" button 
+  //is clicked in order to save the current time sheets and display all the past timesheets
+  //created by user on the page
 
   const handleSave = async () => {
     if (lineItems.length === 0) {
@@ -105,7 +105,7 @@ function App() {
     };
   
     try {
-      const endpoint = '/api/timesheets';  // Example endpoint
+      const endpoint = '/api/timesheets';  
       const uri = createFinalUri(endpoint);
       //alert("uri1"+uri);
       //const response = await axios.post(uri, timesheetData);
@@ -117,12 +117,11 @@ function App() {
       await fetchTimesheets(username);
       
   
-      // After saving, add the saved timesheet to your page immediately
-      // setSaved(prev => [...prev, timesheetData]);
+      
   
-      // Optional: Clear the form
+      
       setDescription('');
-      setRate(0); // reset rate to default
+      setRate(0); 
       setTempRate('');
       setLineItems([]);
     } catch (error) {
@@ -132,17 +131,15 @@ function App() {
   };
   
   
-  //parameterize local host 
-  //add user 
-  //label the description
-
+  //used to handle fetching all previous timesheets made by user when the 
+  //user enters their name and clicks continue to log in
   
 
   const handleContinue = () => {
     if (usernameInput.trim() !== '') {
       const cleanUsername = usernameInput.trim();
       setUser(cleanUsername);
-      fetchTimesheets(cleanUsername); // Only now we fetch
+      fetchTimesheets(cleanUsername); 
     } else {
       alert('Please enter a valid username.');
     }
@@ -150,7 +147,7 @@ function App() {
 
   
 
-
+  //Main UI of the app 
 
   return ( 
     <div style={{ textAlign: 'center', padding: '20px' }}> 
@@ -170,7 +167,7 @@ function App() {
         // Once username is entered, show the timesheet app
         <div>
           <h1>Welcome, {username}!</h1>
-          {/* Timesheet form, tables, everything else */}
+          
           <div style={{
             maxWidth: '90%',
             width: '800px',
@@ -190,14 +187,14 @@ function App() {
               onChange={(e) => {
                 const value = e.target.value;
                 
-                // Allow empty input (so user can erase)
+                
                 if (value === '') {
                   setMinutes('');
                   setError('');
                   return
                 }
       
-                // Only allow whole positive numbers
+                
                 const intValue = parseInt(value, 10);
                 if (!isNaN(intValue) && Number(value) === intValue && intValue >= 0) {
                   setMinutes(intValue);
@@ -212,18 +209,18 @@ function App() {
             
             
             
-            <button onClick={addLineItem}>Add Line</button>
+            <button onClick={addLineItem}>Add Timesheet Entry</button> 
       
             
             <div>
-              {/* decide if you want the rate to be chnaged automatically or only when button clicked */} 
+              
               <text>Enter Rate: </text>
               <input type="number" placeholder="Rate" value={tempRate} onChange={e => setTempRate(e.target.value)} />
               <button
                 onClick={() => {
                   if (tempRate !== '' && /^\d*$/.test(tempRate)) {
                     setRate(Number(tempRate));
-                    setTempRate(''); // clear the box after updating if you want
+                    setTempRate(''); 
                   } else {
                     alert("Please enter a positive number.")
                   }
@@ -245,7 +242,7 @@ function App() {
             </div>
             
             <div className="mt-8">
-              <h2>Current Line Items:</h2>
+              <h2>Current Timesheet:</h2>
       
               {lineItems.length > 0 ? (
                 <table border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse' }}>

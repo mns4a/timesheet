@@ -8,6 +8,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+//gets the current enviornment variables to use for database connection
+
 const host = process.env.REACT_APP_API_HOST; 
 const port = process.env.REACT_APP_API_PORT;
 const prefix = `http://${host}:${port}`;
@@ -24,7 +26,7 @@ db.connect(err => {
   if (err) throw err;
   console.log('MySQL connected...');
 });
-
+//handles post requests from frontend
 app.post('/api/timesheets', (req, res) => {  
   const { description, rate, lineItems, username } = req.body;
   const totalTime = lineItems.reduce((sum, item) => sum + item.minutes, 0);
@@ -53,7 +55,7 @@ app.post('/api/timesheets', (req, res) => {
     }
   );
 });
-//return items that match current user name 
+//handles get requests from frontend server and returns only items that match current user name 
 app.get('/api/timesheets', (req, res) => {
   const username = req.query.username;
 
@@ -65,7 +67,7 @@ app.get('/api/timesheets', (req, res) => {
     'SELECT * FROM timesheets WHERE username = ? ORDER BY created_at DESC',
     [username],
     (err, timesheets) => {
-      if (err) return res.status(500).json(err); // error catch
+      if (err) return res.status(500).json(err); 
 
       const fetchLineItems = timesheets.map(ts => { 
         return new Promise((resolve, reject) => {
@@ -75,9 +77,8 @@ app.get('/api/timesheets', (req, res) => {
             (err, items) => {
               if (err) reject(err);
               else {
-                // Calculate total time and total cost for each timesheet
-                console.log("Hello, Node.js!" + JSON.stringify(ts));
-                console.log("Hello, Node.js!" + JSON.stringify(items));
+                // console.log("Hello, Node.js!" + JSON.stringify(ts));
+                // console.log("Hello, Node.js!" + JSON.stringify(items));
                 resolve({
                   ...ts,
                   lineItems: items
