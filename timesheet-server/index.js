@@ -8,6 +8,11 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+const host = process.env.REACT_APP_API_HOST; 
+const port = process.env.REACT_APP_API_PORT;
+const prefix = `http://${host}:${port}`;
+const fullUri = `${prefix}/api/timesheets`;
+
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -90,5 +95,5 @@ app.get('/api/timesheets', (req, res) => {
   );
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = port || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

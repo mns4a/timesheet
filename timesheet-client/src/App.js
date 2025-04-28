@@ -97,7 +97,7 @@ function App() {
     try {
       const endpoint = '/api/timesheets';  // Example endpoint
       const uri = createFinalUri(endpoint);
-      const response = await axios.post('http://localhost:3001/api/timesheets', timesheetData);
+      const response = await axios.post(uri, timesheetData);
       console.log('Timesheet saved:', response.data);
       alert('Timesheet saved successfully!');
 
@@ -141,7 +141,7 @@ function App() {
 
 
   return ( 
-    <div style={{ textAlign: 'center', padding: '20px' }}>
+    <div style={{ textAlign: 'center', padding: '20px' }}> 
     {!username ? (
         <div>
           <h2>Enter Your Username</h2>
@@ -209,9 +209,11 @@ function App() {
               <input type="number" placeholder="Rate" value={tempRate} onChange={e => setTempRate(e.target.value)} />
               <button
                 onClick={() => {
-                  if (tempRate !== '') {
+                  if (tempRate !== '' && /^\d*$/.test(tempRate)) {
                     setRate(Number(tempRate));
                     setTempRate(''); // clear the box after updating if you want
+                  } else {
+                    alert("Please enter a positive number.")
                   }
                 }}
               >
