@@ -291,7 +291,7 @@ function App() {
           <h2>Saved Timesheets:</h2>
             {saved.map((sheet, idx) => (
               <div key={idx} style={{ border: '1px solid gray', padding: '16px', marginBottom: '20px', borderRadius: '8px' }}>
-                <h3>Timesheet #{idx + 1}</h3>
+                <h3>Timesheet #{idx + 1}</h3> 
                 
                 <p><strong>Description:</strong> {sheet.description}</p>
                 <p><strong>Rate:</strong> ${sheet.rate}</p>
