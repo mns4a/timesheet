@@ -44,7 +44,7 @@ function createConnection() {
     if (err) {
       console.error('MySQL connection failed:', err.message);
     } else {
-      console.log('MySQL connected');
+      console.log('MySQL connected'); 
     }
   });
 
@@ -88,7 +88,8 @@ app.post('/api/timesheets', (req, res) => {
   const { description, rate, lineItems, username } = req.body;
   const totalTime = lineItems.reduce((sum, item) => sum + item.minutes, 0);
   const totalCost = totalTime * rate;
-  db = getConnection(); 
+  getConnection();
+  db=connection; 
   db.query( 
     'INSERT INTO timesheets (description, rate, total_time, total_cost, username) VALUES (?, ?, ?, ?, ?)',
     [description, rate, totalTime, totalCost, username],
@@ -101,10 +102,16 @@ app.post('/api/timesheets', (req, res) => {
         'INSERT INTO line_items (timesheet_id, date, minutes) VALUES ?',
         [values],
         (err) => {
-          if (err) return db.rollback(() => res.status(500).json(err));
+          if (err) {
+            console.log("Error while insert"+err.toString());
+             return db.rollback(() => res.status(500).json(err));
+          }
 
           db.commit((err) => {
-            if (err) return db.rollback(() => res.status(500).json(err));
+            if (err) {
+              console.log("Error while insert commit"+err.toString());
+              return db.rollback(() => res.status(500).json(err));
+            }
             res.json({ success: true, timesheetId });
           });
         }
@@ -120,7 +127,8 @@ app.get('/api/timesheets', (req, res) => {
     return res.status(400).json({ error: 'Username is required' });
   }
   
-  db = getConnection(); 
+  getConnection();
+  db=connection ;
   db.query(
     'SELECT * FROM timesheets WHERE username = ? ORDER BY created_at DESC',
     [username],
@@ -133,7 +141,10 @@ app.get('/api/timesheets', (req, res) => {
             'SELECT date, minutes FROM line_items WHERE timesheet_id = ?',
             [ts.id],
             (err, items) => {
-              if (err) reject(err);
+              if (err) { 
+                console.log("Error while get"+err.toString());
+                reject(err);
+              }
               else {
                 // console.log("Hello, Node.js!" + JSON.stringify(ts));
                 // console.log("Hello, Node.js!" + JSON.stringify(items));
