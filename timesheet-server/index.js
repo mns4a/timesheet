@@ -68,7 +68,8 @@ async function getConnection() {
         console.warn('Connection invalid. Reconnecting...');
         createConnection();
         // Slight delay to allow reconnect
-        setTimeout(() => resolve(connection), 100);
+        //setTimeout(() => resolve(connection), 100);
+        resolve(connection); 
       } else {
         resolve(connection);
       }
